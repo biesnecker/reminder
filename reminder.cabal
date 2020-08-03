@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5e8ae60ecf1cc6b4713e1747fbeb2fd9b80e34a62ca8e7f6a2141735aac431fe
+-- hash: ec44b79f5fdf0ce6fc1b1b0328c8e0cb45067c92dae121e6d63278e351d2e56b
 
 name:           reminder
 version:        0.1.0.0
@@ -31,6 +31,7 @@ executable reminder
       Entry
       Options
       Parser
+      Pretty
       Paths_reminder
   hs-source-dirs:
       app
@@ -39,9 +40,7 @@ executable reminder
       attoparsec <0.14
     , base >=4.7 && <5
     , optparse-applicative <0.16
-    , pipes <4.4
-    , pipes-attoparsec <0.6
-    , pipes-bytestring <3.0
+    , rainbow <0.35
     , streaming <0.3
     , text <1.3
     , time <2.0

@@ -10,6 +10,7 @@ data Options =
     { path      :: FilePath
     , lookAhead :: Int
     , lookBack  :: Int
+    , noColor   :: Bool
     }
   deriving (Show, Eq)
 
@@ -24,7 +25,8 @@ op =
     auto
     (long "lookback" <>
      short 'b' <>
-     help "How many days to surface reminders after they've passed" <> value 0)
+     help "How many days to surface reminders after they've passed" <> value 0) <*>
+  switch (long "no-color" <> help "Disable colors")
 
 withOptions :: (Options -> IO a) -> IO a
 withOptions f = execParser opts >>= f

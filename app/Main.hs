@@ -10,6 +10,7 @@ import           Data.Time         (Day, LocalTime (LocalTime),
 import           Entry
 import           Options
 import           Parser
+import           Pretty
 import qualified Streaming.Prelude as S
 import           System.IO         (Handle, IOMode (ReadMode), withFile)
 
@@ -37,4 +38,6 @@ main =
       entries <-
         sortOn entryDate <$>
         entriesFromHandle (dateRange td lookBack lookAhead) handle
-      mapM_ putStrLn $ map show entries
+      if noColor
+        then printBW entries
+        else printColor td entries
