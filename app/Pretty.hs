@@ -6,15 +6,20 @@ module Pretty
   , printBW
   ) where
 
-import           Data.Bifunctor (bimap)
-import           Data.Time      (Day)
+import           Data.Bifunctor  (bimap)
+import qualified Data.ByteString as BS
+import           Data.List       (intercalate)
+import           Data.Time       (Day)
 import           Entry
 import           Rainbow
 
 printColor :: Day -> [Entry] -> IO ()
-printColor today entries =
-  mapM_ putChunksLn $
-  map (chunksToList . modifyChunkColor today . chunkify) entries
+printColor today entries = do
+  printer <- byteStringMakerFromEnvironment
+  mapM_ BS.putStr . chunksToByteStrings printer $
+    intercalate [chunk "\n"] $
+    map (chunksToList . modifyChunkColor today . chunkify) entries
+  BS.putStr "\n"
 
 printBW :: [Entry] -> IO ()
 printBW = mapM_ putStrLn . map show

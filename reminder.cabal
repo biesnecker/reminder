@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ec44b79f5fdf0ce6fc1b1b0328c8e0cb45067c92dae121e6d63278e351d2e56b
+-- hash: 47bad1d4c3b654ac43d7b6177e16ad142727a1cea82edcb4a56641aeed8f6a62
 
 name:           reminder
 version:        0.1.0.0
@@ -39,6 +39,7 @@ executable reminder
   build-depends:
       attoparsec <0.14
     , base >=4.7 && <5
+    , bytestring <0.11
     , optparse-applicative <0.16
     , rainbow <0.35
     , streaming <0.3
