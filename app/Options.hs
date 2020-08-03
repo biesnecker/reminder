@@ -20,12 +20,14 @@ op =
   option
     auto
     (long "lookahead" <>
-     short 'a' <> help "How many days ahead to surface reminders" <> value 3) <*>
+     short 'a' <>
+     help "How many days ahead to surface reminders" <> value 3 <> showDefault) <*>
   option
     auto
     (long "lookback" <>
      short 'b' <>
-     help "How many days to surface reminders after they've passed" <> value 0) <*>
+     help "How many days to surface reminders after they've passed" <>
+     value 0 <> showDefault) <*>
   switch (long "no-color" <> help "Disable colors")
 
 withOptions :: (Options -> IO a) -> IO a
