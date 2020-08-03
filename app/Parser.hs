@@ -1,33 +1,78 @@
 module Parser where
 
+import           Control.Applicative  (Alternative ((<|>)))
 import           Control.Monad        (void)
 import           Data.Attoparsec.Text
+import           Data.Maybe           (mapMaybe)
 import           Data.Text            (Text)
-import           Data.Time            (Day (..), fromGregorian)
+import           Data.Time            (Day (..), fromGregorian, toGregorian)
 import           Entry
 
-dateParser :: Parser Day
+data WildcardOrNumber
+  = Wildcard
+  | Number Int
+
+wildcardOrDigits :: Int -> Parser WildcardOrNumber
+wildcardOrDigits n =
+  let wc = do
+        void $ char '*'
+        return Wildcard
+      cd = do
+        x <- count n digit
+        return $ Number (read x)
+   in wc <|> cd
+
+anyWildcard :: Traversable t => t WildcardOrNumber -> Bool
+anyWildcard =
+  any $ \w ->
+    case w of
+      Wildcard -> True
+      _        -> False
+
+dateParser :: Parser (WildcardOrNumber, WildcardOrNumber, WildcardOrNumber)
 dateParser = do
-  y <- cd 4
+  y <- wildcardOrDigits 4
   dash
-  m <- cd 2
+  m <- wildcardOrDigits 2
   dash
-  d <- cd 2
-  return $ fromGregorian (read y) (read m) (read d)
+  d <- wildcardOrDigits 2
+  return $ (y, m, d)
   where
-    cd = flip count digit
     dash = void $ char '-'
 
-entryParser :: Parser Entry
-entryParser = do
-  d <- dateParser
+entryParser :: (Day, Day) -> Parser [Entry]
+entryParser range = do
+  (y, m, d) <- dateParser
   skipSpace
   r <- takeText
   endOfInput
-  return $ Entry d r
+  return $ fromWildcards range y m d r
 
-parseEntry :: Text -> Maybe Entry
-parseEntry t =
-  case parseOnly entryParser t of
+fromWildcards ::
+     (Day, Day)
+  -> WildcardOrNumber
+  -> WildcardOrNumber
+  -> WildcardOrNumber
+  -> Text
+  -> [Entry]
+fromWildcards (start, end) y m d txt = mapMaybe go [start .. end]
+  where
+    matchWildcard wc n =
+      case wc of
+        Wildcard -> Just n
+        Number x ->
+          if (fromIntegral x) == n
+            then Just n
+            else Nothing
+    go day = do
+      let (cy, cm, cd) = toGregorian day
+      my <- matchWildcard y cy
+      mm <- matchWildcard m cm
+      md <- matchWildcard d cd
+      return $ Entry (fromGregorian my mm md) txt
+
+parseEntry :: (Day, Day) -> Text -> Maybe [Entry]
+parseEntry range t =
+  case parseOnly (entryParser range) t of
     Left _  -> Nothing
     Right r -> Just r
