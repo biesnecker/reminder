@@ -1,4 +1,6 @@
-module Parser where
+module Parser
+  ( parseEntry
+  ) where
 
 import           Control.Applicative  (Alternative ((<|>)))
 import           Control.Monad        (void)
@@ -21,13 +23,6 @@ wildcardOrDigits n =
         x <- count n digit
         return $ Number (read x)
    in wc <|> cd
-
-anyWildcard :: Traversable t => t WildcardOrNumber -> Bool
-anyWildcard =
-  any $ \w ->
-    case w of
-      Wildcard -> True
-      _        -> False
 
 dateParser :: Parser (WildcardOrNumber, WildcardOrNumber, WildcardOrNumber)
 dateParser = do
