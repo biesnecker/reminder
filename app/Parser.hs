@@ -50,6 +50,11 @@ fromWildcards ::
   -> WildcardOrNumber
   -> Text
   -> [Entry]
+fromWildcards (start, end) (Number y) (Number m) (Number d) txt =
+  let singleDate = fromGregorian (fromIntegral y) m d
+   in if singleDate >= start && singleDate <= end
+        then [Entry singleDate txt]
+        else []
 fromWildcards (start, end) y m d txt = mapMaybe go [start .. end]
   where
     matchWildcard wc n =
