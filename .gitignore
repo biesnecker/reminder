@@ -9,6 +9,7 @@ cabal-dev
 cabal.sandbox.config
 .*.sw[po]
 .stack-work
+.dist-newstyle
 
 # just create your own with `stack init` to best fit your setup
 stack.yaml

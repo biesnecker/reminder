@@ -17,7 +17,7 @@ entriesFromHandle :: (Day, Day) -> Handle -> IO [Entry]
 entriesFromHandle range hdl = S.toList_
   $ S.concat
   $ S.mapMaybe (parseEntry range)
-  $ (S.map T.pack)
+  $ S.map T.pack
   $ S.fromHandle hdl
 
 today :: IO Day
@@ -28,7 +28,7 @@ today = do
 dateRange :: Day -> Int -> Int -> (Day, Day)
 dateRange start back forward =
   let bd = addDays (fromIntegral $ (-1) * back) start
-      ad = addDays (fromIntegral $ forward) start
+      ad = addDays (fromIntegral forward) start
   in (bd, ad)
 
 main :: IO ()

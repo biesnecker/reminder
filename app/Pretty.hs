@@ -19,7 +19,7 @@ printColor today entries = do
   BS.putStr "\n"
 
 printBW :: [Entry] -> IO ()
-printBW = mapM_ putStrLn . map show
+printBW = mapM_ (print . show)
 
 chunkify :: Entry -> (Day, (Chunk, Chunk))
 chunkify e = let (d, r) = entryParts e
