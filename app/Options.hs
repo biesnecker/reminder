@@ -1,41 +1,37 @@
-module Options
-  ( Options(..)
-  , withOptions
-  ) where
+module Options (Options(..), withOptions) where
 
 import           Options.Applicative
 
-data Options =
-  Options
-    { path      :: FilePath
-    , lookAhead :: Int
-    , lookBack  :: Int
-    , noColor   :: Bool
-    }
+data Options = Options { path :: FilePath
+                       , lookAhead :: Int
+                       , lookBack :: Int
+                       , noColor :: Bool
+                       }
   deriving (Show, Eq)
 
 op :: Parser Options
-op =
-  Options <$> argument str (metavar "FILE") <*>
-  option
+op = Options <$> argument str (metavar "FILE")
+  <*> option
     auto
-    (long "lookahead" <>
-     short 'a' <>
-     help "How many days ahead to surface reminders" <> value 3 <> showDefault) <*>
-  option
+    (long "lookahead"
+     <> short 'a'
+     <> help "How many days ahead to surface reminders"
+     <> value 3
+     <> showDefault)
+  <*> option
     auto
-    (long "lookback" <>
-     short 'b' <>
-     help "How many days to surface reminders after they've passed" <>
-     value 0 <> showDefault) <*>
-  switch (long "no-color" <> help "Disable colors")
+    (long "lookback"
+     <> short 'b'
+     <> help "How many days to surface reminders after they've passed"
+     <> value 0
+     <> showDefault)
+  <*> switch (long "no-color" <> help "Disable colors")
 
 withOptions :: (Options -> IO a) -> IO a
 withOptions f = execParser opts >>= f
   where
-    opts =
-      info
-        (op <**> helper)
-        (fullDesc <>
-         progDesc "Shows reminders on the commandline" <>
-         header "reminder - so you don't forget")
+    opts = info
+      (op <**> helper)
+      (fullDesc
+       <> progDesc "Shows reminders on the commandline"
+       <> header "reminder - so you don't forget")

@@ -1,18 +1,15 @@
-module Parser
-  ( parseEntry
-  ) where
+module Parser (parseEntry) where
 
-import           Control.Applicative  (Alternative ((<|>)))
-import           Control.Monad        (void)
+import           Control.Applicative (Alternative((<|>)))
+import           Control.Monad (void)
 import           Data.Attoparsec.Text
-import           Data.Maybe           (mapMaybe)
-import           Data.Text            (Text)
-import           Data.Time            (Day (..), fromGregorian, toGregorian)
+import           Data.Maybe (mapMaybe)
+import           Data.Text (Text)
+import           Data.Time (Day(..), fromGregorian, toGregorian)
 import           Entry
 
-data WildcardOrNumber
-  = Wildcard
-  | Number Int
+data WildcardOrNumber = Wildcard
+                      | Number Int
 
 wildcardOrDigits :: Int -> Parser WildcardOrNumber
 wildcardOrDigits n =
@@ -22,7 +19,7 @@ wildcardOrDigits n =
       cd = do
         x <- count n digit
         return $ Number (read x)
-   in wc <|> cd
+  in wc <|> cd
 
 dateParser :: Parser (WildcardOrNumber, WildcardOrNumber, WildcardOrNumber)
 dateParser = do
@@ -43,27 +40,25 @@ entryParser range = do
   endOfInput
   return $ fromWildcards range y m d r
 
-fromWildcards ::
-     (Day, Day)
-  -> WildcardOrNumber
-  -> WildcardOrNumber
-  -> WildcardOrNumber
-  -> Text
-  -> [Entry]
+fromWildcards :: (Day, Day)
+              -> WildcardOrNumber
+              -> WildcardOrNumber
+              -> WildcardOrNumber
+              -> Text
+              -> [Entry]
 fromWildcards (start, end) (Number y) (Number m) (Number d) txt =
   let singleDate = fromGregorian (fromIntegral y) m d
-   in if singleDate >= start && singleDate <= end
-        then [Entry singleDate txt]
-        else []
+  in if singleDate >= start && singleDate <= end
+     then [Entry singleDate txt]
+     else []
 fromWildcards (start, end) y m d txt = mapMaybe go [start .. end]
   where
-    matchWildcard wc n =
-      case wc of
-        Wildcard -> Just n
-        Number x ->
-          if (fromIntegral x) == n
-            then Just n
-            else Nothing
+    matchWildcard wc n = case wc of
+      Wildcard -> Just n
+      Number x -> if (fromIntegral x) == n
+                  then Just n
+                  else Nothing
+
     go day = do
       let (cy, cm, cd) = toGregorian day
       my <- matchWildcard y cy
@@ -72,7 +67,6 @@ fromWildcards (start, end) y m d txt = mapMaybe go [start .. end]
       return $ Entry (fromGregorian my mm md) txt
 
 parseEntry :: (Day, Day) -> Text -> Maybe [Entry]
-parseEntry range t =
-  case parseOnly (entryParser range) t of
-    Left _  -> Nothing
-    Right r -> Just r
+parseEntry range t = case parseOnly (entryParser range) t of
+  Left _  -> Nothing
+  Right r -> Just r
